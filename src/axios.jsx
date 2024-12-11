@@ -10,17 +10,21 @@ const instance = axios.create({
   },
 });
 
+const filterMovies = (movies) => {
+  return movies
+    .filter((movie) => !movie.adult)
+    .map((movie) => ({
+      ...movie,
+      vote_average: movie.vote_average.toFixed(1),
+    }));
+};
+
 export const getMovieList = async () => {
   try {
     const response = await instance.get(
       `/movie/popular?api_key=${apiKey}&language=ko-KR`
     );
-    const filteredMovieList = response.data.results
-      .filter((movie) => !movie.adult)
-      .map((movie) => ({
-        ...movie,
-        vote_average: movie.vote_average.toFixed(1),
-      }));
+    const filteredMovieList = filterMovies(response.data.results);
     return filteredMovieList;
   } catch (error) {
     console.error("영화 목록을 가져오는 중 오류 발생:", error);
@@ -47,9 +51,14 @@ export const getMovieDetail = async (id) => {
 };
 
 export default async function searchMovies(searchTerm) {
-  const response = await fetch(
-    `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${searchTerm}`
-  );
-  const data = await response.json();
-  return data.results;
+  try {
+    const response = await instance.get(
+      `/search/movie?api_key=${apiKey}&query=${searchTerm}`
+    );
+    const filteredMovieList = filterMovies(response.data.results);
+    return filteredMovieList;
+  } catch (error) {
+    console.error("영화 검색 중 오류 발생:", error);
+    throw new Error("영화 검색에 실패했습니다.");
+  }
 }

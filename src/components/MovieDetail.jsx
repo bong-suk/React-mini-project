@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import "./MovieDetail.css";
 import { useParams } from "react-router-dom";
 import { getMovieDetail } from "../axios";
+import "./MovieDetail.css";
 
 const MovieDetail = () => {
   const { id } = useParams();

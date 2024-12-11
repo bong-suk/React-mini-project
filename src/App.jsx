@@ -1,14 +1,11 @@
 import "./App.css";
-import { MovieListProvider } from "./contexts/MovieListContext.jsx";
 import AppRoutes from "./routes";
+import useAuthSession from "./hooks/useAuthSession";
+
 function App() {
-  return (
-    <>
-      <MovieListProvider>
-        <AppRoutes />
-      </MovieListProvider>
-    </>
-  );
+  useAuthSession();
+
+  return <AppRoutes />;
 }
 
 export default App;

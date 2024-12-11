@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import Layout from "./components/Layout";
 import { getMovieList } from "./axios";
 import SearchResults from "./components/Search";
+import Login from "./pages/Login";
+import SignUp from "./pages/SignUp";
 
 const AppRoutes = () => {
   const [movieList, setMovieList] = useState([]);
@@ -23,6 +25,7 @@ const AppRoutes = () => {
   }, []);
 
   const filteredMovieList = movieList.filter((movie) => !movie.adult);
+
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
@@ -30,14 +33,16 @@ const AppRoutes = () => {
           index
           element={
             <main>
-              {filteredMovieList.map((item) => {
-                return <MovieCard key={item.id} {...item} />;
-              })}
+              {filteredMovieList.map((item) => (
+                <MovieCard key={item.id} {...item} />
+              ))}
             </main>
           }
         />
         <Route path="/details/:id" element={<MovieDetail />} />
         <Route path="/search" element={<SearchResults />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<SignUp />} />
       </Route>
     </Routes>
   );

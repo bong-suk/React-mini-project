@@ -1,43 +1,45 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
+import { useDebounce } from "../hooks/useDebounce";
 import MovieCard from "./MovieCard";
-import { useDebounce } from "./useDebounce";
 import searchMovies from "../axios";
-import "./search.css";
+import "./Search.css";
+
 const SearchResults = () => {
-  const [movieList, setMovieList] = useState([]);
-  const useQuery = () => {
-    return new URLSearchParams(useLocation().search);
-  };
-  let query = useQuery();
-  const searchTerm = query.get(`q`);
-  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const [searchParams] = useSearchParams();
+  const query = searchParams.get("query");
+  const [searchResults, setSearchResults] = useState([]);
+  const debouncedQuery = useDebounce(query);
 
   useEffect(() => {
-    const fetchMovies = async () => {
-      if (debouncedSearchTerm) {
-        try {
-          const response = await searchMovies(debouncedSearchTerm);
-          setMovieList(response);
-        } catch (error) {
-          console.error("영화 검색 중 오류 발생:", error);
-        }
+    const fetchSearchResults = async () => {
+      if (!debouncedQuery) return;
+
+      try {
+        const results = await searchMovies(debouncedQuery);
+        setSearchResults(results);
+      } catch (error) {
+        console.error("검색 결과를 가져오는 중 오류 발생:", error);
       }
     };
 
-    fetchMovies();
-  }, [debouncedSearchTerm]);
+    fetchSearchResults();
+  }, [debouncedQuery]);
 
   return (
     <div className="search-container">
-      {movieList && movieList.length > 0 ? (
-        movieList.map((item) => (
-          <MovieCard className="search-card" key={item.id} {...item} />
-        ))
+      <h2 className="search-title">'{query}' 검색 결과</h2>
+      {searchResults.length > 0 ? (
+        <div className="search-results">
+          {searchResults.map((movie) => (
+            <MovieCard key={movie.id} {...movie} />
+          ))}
+        </div>
       ) : (
-        <div>검색 결과가 없습니다.</div>
+        <p className="no-results">검색 결과가 없습니다.</p>
       )}
     </div>
   );
 };
+
 export default SearchResults;
